@@ -1,187 +1,306 @@
 # NMSkies Telescope Automation System
 
-Automated satellite tracking and observation system for PlaneWave telescopes at New Mexico Skies observatory in Cloudcroft, NM.
+Automated satellite tracking and observation system for PlaneWave telescopes, developed for New Mexico Skies Observatory and the ASTRIANet collaboration with UT Austin.
 
 ## Overview
 
-This system automates the process of:
-1. Fetching Two-Line Element (TLE) data for satellites from N2YO API
-2. Calculating visible passes for the observatory location
-3. Controlling the PlaneWave telescope mount via PWI4 HTTP API
-4. Managing dome operations via ASCOM Digital DomeWorks
-5. Capturing images during satellite passes using MaxIm DL
-6. Providing a web dashboard for monitoring and control
+This system automates the complete satellite observation workflow:
+1. **TLE Acquisition** - Fetches Two-Line Element data from N2YO API
+2. **Pass Prediction** - Calculates visible satellite passes for the observatory location
+3. **Mount Control** - Commands PlaneWave mount via PWI4 HTTP API
+4. **Dome Control** - Operates dome via ASCOM Digital DomeWorks
+5. **Image Capture** - Takes exposures via MaxIm DL
+6. **Scheduling** - Automates nightly observation cycles
 
-## Location
-- **Observatory:** New Mexico Skies, Cloudcroft, NM
-- **Coordinates:** 32.957313°N, 105.742485°W
-- **Altitude:** 2,225m (7,300ft)
-- **Timezone:** America/Denver (MST/MDT)
+## Installation Location
 
-## Architecture
-
+**Windows Target Path:**
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                     Dashboard (dashapp.py)                       │
-│                    http://localhost:8050                         │
-└─────────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                   api_interaction.py                             │
-│         Fetches TLE data from N2YO, calculates passes            │
-│              Outputs: tleplan.txt                                │
-└─────────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                     automated2.py                                │
-│            Main automation controller                            │
-│     - Starts PWI4 mount                                         │
-│     - Opens dome via DDW                                        │
-│     - Runs observation sequence                                 │
-└─────────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                  pwi4_tle_observer.py                           │
-│         Executes satellite tracking observations                 │
-│     - Slews mount to follow TLE                                 │
-│     - Captures images via MaxIm DL                              │
-│     - Saves FITS files with metadata                            │
-└─────────────────────────────────────────────────────────────────┘
+C:\Program Files (x86)\PlaneWave Instruments\PlaneWave Interface 4\Scripts
 ```
 
-## Key Components
+This is the default PWI4 Scripts folder. The automation code should reside here to integrate with PlaneWave software.
 
-### Core Scripts
+## Directory Structure
 
-| File | Description |
-|------|-------------|
-| `pwi4_client.py` | PlaneWave PWI4 HTTP API client library |
-| `api_interaction.py` | Fetches TLE data from N2YO, generates observation plan |
-| `automated2.py` | Main automation script - controls mount, dome, and observations |
-| `pwi4_tle_observer.py` | Executes satellite tracking and image capture |
+```
+NMSKIES/
+├── README.md                 # This file
+├── SETUP.md                  # Installation guide
+├── ANALYSIS.md               # Detailed code analysis
+├── ARCHITECTURE.md           # System architecture
+├── requirements.txt          # Python dependencies
+├── config.sample.py          # Configuration template
+│
+├── src/                      # Core production modules
+│   ├── pwi4_client.py       # PlaneWave API client (DO NOT MODIFY)
+│   ├── api_interaction.py   # TLE fetching & scheduling
+│   ├── pwi4_tle_observer.py # Observation execution
+│   ├── automated2.py        # Main automation controller
+│   └── cache_manager.py     # TLE caching utility
+│
+├── gui/                      # User interfaces
+│   ├── tkinter_app.py       # Windows desktop application
+│   ├── web_dashboard.py     # Plotly Dash web interface
+│   └── dialogs.py           # Input dialogs
+│
+├── utils/                    # Utility modules
+│   ├── helpers.py           # Common helper functions
+│   ├── image_downloader.py  # GOES satellite imagery
+│   └── observation_filter.py # Observation window adjustment
+│
+├── runners/                  # Automation scripts
+│   ├── infinite.py          # Continuous observation daemon
+│   ├── flask_dashboard.py   # Remote control server
+│   └── run_scripts.bat      # Windows batch runner
+│
+├── templates/                # Web templates
+│   └── index.html
+│
+├── data/                     # Sample data files
+│   ├── noradid.sample.txt   # Example NORAD IDs
+│   └── tleplan.sample.txt   # Example observation plan
+│
+├── planewave_reference/      # PlaneWave sample code
+│   ├── README.txt
+│   ├── pwi4_client_demo.py
+│   ├── pwi4_startup.py
+│   ├── pwi4_build_model.py
+│   └── platesolve.py
+│
+└── archive/                  # Deprecated code (reference only)
+    └── deprecated_dashb/
+```
 
-### Dashboard
+## Quick Start
 
-| File | Description |
-|------|-------------|
-| `dashb/dashapp.py` | Plotly Dash web dashboard for monitoring/control |
-| `dashb/server.py` | Flask server for dashboard |
+### 1. Prerequisites
 
-### Configuration Files
-
-| File | Description |
-|------|-------------|
-| `noradid.txt` | List of NORAD IDs to track (currently Starlink satellites) |
-| `tleplan.txt` | Generated observation plan with TLE data and timing |
-| `cache.json` | TLE data cache to reduce API calls |
-
-### Utilities
-
-| File | Description |
-|------|-------------|
-| `askfornorad.py` | GUI dialog for entering NORAD IDs |
-| `platesolve.py` | Plate solving utilities |
-| `dashboard.py` | Alternative dashboard implementation |
-
-## Installation
-
-### Requirements
-
-- Windows 7/10/11 (for PlaneWave and ASCOM integration)
+- Windows 7/10/11
 - Python 3.8+
 - PlaneWave Interface 4 (PWI4)
-- MaxIm DL (for camera control)
-- Digital DomeWorks (for dome control)
+- MaxIm DL
+- Digital DomeWorks
+- ASCOM Platform
 
-### Python Dependencies
-
-```bash
-pip install requests loguru dash dash-bootstrap-components plotly pytz pywin32 aiohttp
-```
-
-Or use the included virtual environment:
-```bash
-cd Scripts
-.\base\Scripts\activate
-```
-
-## Usage
-
-### Interactive Mode (GUI)
+### 2. Installation
 
 ```bash
-python api_interaction.py
-```
-- Prompts for NORAD IDs, observation days, and window duration
-- Generates `tleplan.txt` with observation schedule
+# Clone the repository
+git clone https://github.com/ciaran-png/NMSKIES.git
+cd NMSKIES
 
-### Non-Interactive Mode (Automated)
+# Create virtual environment
+python -m venv venv
+venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Copy and configure settings
+copy config.sample.py config.py
+# Edit config.py with your API keys and paths
+```
+
+### 3. Configuration
+
+Edit `config.py`:
+```python
+# N2YO API Key (get from https://www.n2yo.com/api/)
+N2YO_API_KEY = "YOUR_API_KEY_HERE"
+
+# Observatory Location
+OBSERVER_LAT = 32.903      # Your latitude
+OBSERVER_LNG = -105.5295   # Your longitude
+OBSERVER_ALT = 2225        # Altitude in meters
+
+# Output paths
+OUTPUT_PATH = "D:\\SatelliteData"
+```
+
+### 4. Create NORAD ID List
 
 ```bash
-python api_interaction.py --non-interactive --days 1 --observation-window 2
+# Copy sample and edit with your target satellites
+copy data\noradid.sample.txt noradid.txt
 ```
-- Uses NORAD IDs from `noradid.txt`
-- Runs without user prompts
 
-### Start Dashboard
+### 5. Run
 
+**Option A: Full Automation (Recommended)**
 ```bash
-python dashb/dashapp.py
+python runners/infinite.py
 ```
-- Opens at http://localhost:8050
-- Shows observatory status, sun times, controls
+This runs continuously, waiting for sunset and executing observations nightly.
 
-### Run Full Automation
-
+**Option B: Manual Control via GUI**
 ```bash
-python automated2.py
+python gui/tkinter_app.py
 ```
-- Starts mount, opens dome, runs observations
-- Shuts down automatically after completing schedule
 
-### Shutdown Only
-
+**Option C: Web Dashboard**
 ```bash
-python automated2.py shutdown
+python gui/web_dashboard.py
+# Open http://localhost:8050
 ```
 
-## API Keys
+**Option D: Single Run**
+```bash
+# Generate observation plan
+python src/api_interaction.py --non-interactive --days 1
 
-The system uses the N2YO API for satellite data:
-- Current key in `api_interaction.py`: `HW52FN-38SNHM-5WKRHM-566K`
-- Get your own at: https://www.n2yo.com/api/
-
-## Output
-
-Images are saved to: `D:\SatelliteData\{timestamp}_{satellite_name}\`
-
-Filename format:
-```
-{sequence}_Azm_{azimuth}_Alt_{altitude}_Axis0Dist_{dist0}_Axis1Dist_{dist1}.fits
+# Execute observations
+python src/automated2.py
 ```
 
-## Logs
+## System Architecture
 
-- `telescope_automation_log.txt` - Main automation log
-- `api_interaction_log.txt` - TLE fetch log  
-- `access_log.txt` - Dashboard access log
-- `guioperations.log` - GUI operations log
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        USER INTERFACES                          │
+├─────────────────┬─────────────────┬─────────────────────────────┤
+│ tkinter_app.py  │ web_dashboard.py│ infinite.py (daemon)        │
+│ (Desktop GUI)   │ (Web :8050)     │ (Headless automation)       │
+└────────┬────────┴────────┬────────┴──────────────┬──────────────┘
+         │                 │                       │
+         └─────────────────┼───────────────────────┘
+                           │
+                           ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    CORE AUTOMATION                              │
+│                    automated2.py                                │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────────────┐  │
+│  │ startup_pwi4 │→ │ control_ddw  │→ │ run_observer()       │  │
+│  │ (mount init) │  │ (dome ops)   │  │ (observation loop)   │  │
+│  └──────────────┘  └──────────────┘  └──────────────────────┘  │
+└─────────────────────────────────────────────────────────────────┘
+         │                 │                       │
+         ▼                 ▼                       ▼
+┌─────────────────┐ ┌─────────────────┐ ┌─────────────────────────┐
+│  pwi4_client.py │ │ DDW (ASCOM)     │ │ pwi4_tle_observer.py    │
+│  ↓              │ │ Dome Control    │ │ ↓                       │
+│  PWI4 HTTP API  │ └─────────────────┘ │ MaxIm DL Camera         │
+│  (localhost:    │                     │ ↓                       │
+│   8220)         │                     │ FITS files to disk      │
+└─────────────────┘                     └─────────────────────────┘
+         │                                         │
+         ▼                                         ▼
+┌─────────────────┐                     ┌─────────────────────────┐
+│ PlaneWave Mount │                     │ D:\SatelliteData\       │
+│ (L-series/CDK)  │                     │ └── {timestamp}_{sat}\  │
+└─────────────────┘                     │     └── *.fits          │
+                                        └─────────────────────────┘
+```
 
-## Original PlaneWave Scripts
+## Data Flow
 
-The following are original PlaneWave sample scripts:
-- `pwi4_client.py` - API client (reference implementation)
-- `pwi4_client_demo.py` - Basic usage example
-- `pwi4_startup.py` - Startup sequence example
-- `pwi4_build_model.py` - Pointing model builder
+```
+┌──────────────┐     ┌──────────────┐     ┌──────────────┐
+│ noradid.txt  │ ──▶ │ N2YO API     │ ──▶ │ tleplan.txt  │
+│ (NORAD IDs)  │     │ (TLE data)   │     │ (schedule)   │
+└──────────────┘     └──────────────┘     └──────────────┘
+                                                 │
+                                                 ▼
+                     ┌──────────────────────────────────────┐
+                     │ pwi4_tle_observer.py                 │
+                     │ For each observation:                │
+                     │   1. Parse TLE from tleplan.txt      │
+                     │   2. pwi4.mount_follow_tle()         │
+                     │   3. MaxIm DL exposure               │
+                     │   4. Save FITS with metadata         │
+                     └──────────────────────────────────────┘
+                                                 │
+                                                 ▼
+                     ┌──────────────────────────────────────┐
+                     │ D:\SatelliteData\                    │
+                     │ └── 20250124_193955_STARLINK-1628\   │
+                     │     ├── 0001_Azm_45.2_Alt_32.1_...   │
+                     │     ├── 0002_Azm_46.1_Alt_33.2_...   │
+                     │     └── ...                          │
+                     └──────────────────────────────────────┘
+```
 
-## Author
+## File Formats
 
-Ciaran Trevino - Space4All / ASTRIANet collaboration
+### noradid.txt
+Comma-separated NORAD catalog IDs:
+```
+25544,20580,33591,46027,46028,...
+```
+
+### tleplan.txt
+```
+BEGINLOCAL 2025-01-24 19:39:55
+ENDLOCAL 2025-01-24 19:43:55
+NAME STARLINK-1628
+0 STARLINK-1628
+1 46169U 20057BE  25022.93928310  .00090653  00000-0  85658-3 0  9996
+2 46169  53.0434 106.2911 0000315 268.4288  91.6691 15.66280961275329
+
+BEGINLOCAL 2025-01-24 19:46:35
+...
+```
+
+## Observatory Details
+
+**New Mexico Skies Observatory**
+- Location: Cloudcroft, New Mexico
+- Coordinates: 32.903°N, 105.5295°W
+- Altitude: 2,225m (7,300ft)
+- Timezone: America/Denver (MST/MDT)
+
+## API Keys Required
+
+1. **N2YO API** - https://www.n2yo.com/api/
+   - Free tier: 1000 requests/hour
+   - Used for TLE data and pass predictions
+
+## Hardware Requirements
+
+- PlaneWave telescope mount (L-series or CDK)
+- Digital DomeWorks compatible dome
+- CCD camera supported by MaxIm DL
+- Windows PC connected to all hardware
+
+## Software Requirements
+
+- PlaneWave Interface 4 (PWI4) - https://planewave.com/software/
+- MaxIm DL - https://diffractionlimited.com/product/maxim-dl/
+- Digital DomeWorks - http://www.intechengineering.com/
+- ASCOM Platform - https://ascom-standards.org/
+- Python 3.8+ - https://www.python.org/
+
+## Troubleshooting
+
+### PWI4 Connection Failed
+- Ensure PWI4 is running
+- Check port 8220 is accessible: `http://localhost:8220/status`
+
+### Dome Not Responding
+- Verify Digital DomeWorks is running
+- Check ASCOM connection
+
+### N2YO API Errors
+- Verify API key is valid
+- Check rate limits (1000/hour free tier)
+
+### Camera Issues
+- Ensure MaxIm DL is installed and licensed
+- Verify camera connection in MaxIm
+
+## Authors
+
+**Ciaran Trevino** - Space4All / ASTRIANet Collaboration
+- GitHub: [@ciaran-png](https://github.com/ciaran-png)
+
+## Acknowledgments
+
+- **PlaneWave Instruments** - pwi4_client.py reference implementation
+- **New Mexico Skies** - Observatory hosting
+- **ASTRIANet / UT Austin** - Collaboration on space domain awareness
+- **Moriba Jah** - ASTRIANet Principal Investigator
 
 ## License
 
-See `base/LICENSE` for PlaneWave client library license.
+This project contains both original code and PlaneWave reference implementations.
+See individual files for specific licensing.

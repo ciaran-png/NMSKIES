@@ -1,51 +1,128 @@
-# Byte-compiled / optimized / DLL files
+# NMSkies Telescope Automation - Git Ignore
+
+# =============================================================================
+# SENSITIVE DATA - NEVER COMMIT
+# =============================================================================
+config.py                  # Contains API keys and credentials
+*.key
+*.pem
+secrets/
+
+# =============================================================================
+# RUNTIME DATA FILES
+# =============================================================================
+# Current observation data (regenerated each run)
+noradid.txt                # User's actual NORAD ID list
+tleplan.txt                # Generated observation schedule
+current_norad_id.txt       # Runtime state file
+
+# Cache files
+cache.json                 # TLE data cache
+
+# =============================================================================
+# LOG FILES
+# =============================================================================
+*.log
+telescope_automation_log.txt
+api_interaction_log.txt
+access_log.txt
+guioperations.log
+backup_log.txt
+dashboard.log
+script.log
+
+# =============================================================================
+# GENERATED IMAGES
+# =============================================================================
+weather.jpg
+weather.png
+weather.gif
+*.fits
+image.fits
+
+# =============================================================================
+# PYTHON
+# =============================================================================
 __pycache__/
 *.py[cod]
 *$py.class
 *.pyc
+*.pyo
+.Python
+*.so
 
-# Virtual environment
-base/
+# Virtual environments
 venv/
+ENV/
 env/
+base/                      # Windows virtual environment
 .venv/
 
-# IDE
+# Distribution / packaging
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# =============================================================================
+# IDE / EDITOR
+# =============================================================================
 .idea/
 .vscode/
 *.swp
 *.swo
+*~
+.project
+.pydevproject
+.settings/
+*.sublime-workspace
+*.sublime-project
 
-# Logs
-*.log
-*_log.txt
-
-# Keep sample and readme files
-!README*.txt
-!noradid.sample.txt
-!tleplan.sample.txt
-!requirements.txt
-
-# Cache
-cache.json
-*.cache
-
-# Sensitive data
-*_log.txt
-
-# Image files (don't commit observation data)
-*.fits
-*.gif
-*.jpg
-*.png
-!resized_privateer.png
-
-# OS files
+# =============================================================================
+# OS FILES
+# =============================================================================
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
+desktop.ini
 
-# Local config
-current_norad_id.txt
-tleplan.txt
-config.py
-noradid.txt
+# =============================================================================
+# ARCHIVE (already in repo, but ignore additions)
+# =============================================================================
+archive/deprecated_dashb/__pycache__/
+
+# =============================================================================
+# KEEP THESE FILES (negation rules)
+# =============================================================================
+!README.md
+!README_PLANEWAVE_ORIGINAL.txt
+!planewave_reference/README.txt
+!SETUP.md
+!ARCHITECTURE.md
+!ANALYSIS.md
+!requirements.txt
+!config.sample.py
+!.gitignore
+!data/noradid.sample.txt
+!data/tleplan.sample.txt
+
+# =============================================================================
+# SATELLITE DATA OUTPUT (would be huge)
+# =============================================================================
+SatelliteData/
+D:/SatelliteData/
