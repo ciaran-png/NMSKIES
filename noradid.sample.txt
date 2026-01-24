@@ -1,0 +1,12 @@
+# Sample NORAD IDs for satellite tracking
+# Format: comma-separated NORAD catalog numbers
+# 
+# Example satellites:
+# 25544 - ISS (ZARYA)
+# 20580 - Hubble Space Telescope
+# 33591 - NOAA 19
+#
+# The main noradid.txt contains Starlink satellites
+# Modify this file or create your own list
+
+25544,20580,33591

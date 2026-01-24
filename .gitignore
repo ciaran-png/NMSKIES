@@ -1,0 +1,51 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+
+# Virtual environment
+base/
+venv/
+env/
+.venv/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs
+*.log
+*_log.txt
+
+# Keep sample and readme files
+!README*.txt
+!noradid.sample.txt
+!tleplan.sample.txt
+!requirements.txt
+
+# Cache
+cache.json
+*.cache
+
+# Sensitive data
+*_log.txt
+
+# Image files (don't commit observation data)
+*.fits
+*.gif
+*.jpg
+*.png
+!resized_privateer.png
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Local config
+current_norad_id.txt
+tleplan.txt
+config.py
+noradid.txt
